@@ -43,6 +43,19 @@ app.get('/api/courses/:id', (req, res) => {
     res.send(courseObjectOrNull)  
 })
 
+// make post request to course
+app.post('/api/courses', (req, res) => {
+    const course = {
+        id: courses.length + 1,
+        name: req.body.name
+    }
+    // add course to array
+    courses.push(course)
+    // send course object back to client as confirmation, plus client needs info like id etc.
+    res.send(course)
+
+})
+
 // start listening on a given port, with callback function
 // environment usually has PORT variable, otherwise use 3000
 const port = process.env.PORT || 3000
