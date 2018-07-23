@@ -38,26 +38,22 @@ app.get('/api/courses/:id', (req, res) => {
     // check if courses has course with id sent by client
     // array.find goes through each element and stops at that execution of the callback which
     // returns true
-    const courseObjectOrNull = courses.find(element => element.id === parseInt(req.params.id))
-    if (!courseObjectOrNull) { // return 404
+    const course = courses.find(element => element.id === parseInt(req.params.id))
+    if (!course) { // return 404
         res.status(404).send('No course with given ID')
     }
     // actual reponse
-    res.send(courseObjectOrNull)  
+    res.send(course)  
 })
 
 // make post request to course
 app.post('/api/courses', (req, res) => {
-    // define course schema using Joi
-    const schema = {
-        name: Joi.string().min(3).required(),
-    }
-    // store result of Joi validation call
-    const result = Joi.validate(req.body, schema)
+    // validate function result
+    const result = validateCourse(req.body)
     // input validation
     if (result.error) {
         // send error message
-        res.status(404).send(result.error.details[0].message)
+        res.status(400).send(result.error.details[0].message)
         return
     }
     // construct course
@@ -70,6 +66,41 @@ app.post('/api/courses', (req, res) => {
     // send course object back to client as confirmation, plus client needs info like id etc.
     res.send(course)
 })
+
+// PUT route to update specific course
+app.put('/api/courses/:id', (req, res) => {
+    // lookup course
+    // if not found, return 404
+    const course = courses.find(element => element.id === parseInt(req.params.id))
+    if (!course) { // return 404
+        res.status(404).send('No course with given ID')
+        return
+    }
+    // validate
+    // if invalid, return 400
+    const result = validateCourse(req.body)
+    // input validation
+    if (result.error) {
+        // send error message
+        res.status(400).send(result.error.details[0].message)
+        return
+    }
+    // update course
+    course.name = req.body.name
+    // return the updated course
+    res.send(course)
+})
+
+// helper to validate input
+function validateCourse(course) {
+    // define course schema using Joi
+    const schema = {
+        name: Joi.string().min(3).required(),
+    }
+    // store result of Joi validation call
+    const result = Joi.validate(course, schema)
+    return result
+}
 
 // start listening on a given port, with callback function
 // environment usually has PORT variable, otherwise use 3000
