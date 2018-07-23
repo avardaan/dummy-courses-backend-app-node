@@ -1,3 +1,5 @@
+// input validation module Joi
+const Joi = require('joi')
 // the require express statement returns a function
 const express = require('express')
 // make an instance of the express object class
@@ -5,6 +7,7 @@ const app = express()
 // enable json parsing
 app.use(express.json())
 
+// hardcoded courses array
 const courses = [
     { id: 1, name: 'course1' },
     { id: 2, name: 'course2' },
@@ -45,6 +48,13 @@ app.get('/api/courses/:id', (req, res) => {
 
 // make post request to course
 app.post('/api/courses', (req, res) => {
+    // input validation
+    if (!req.body.name || req.body.name.length < 3) {
+        // send error message
+        res.status(404).send('Name invalid')
+        return
+    }
+    // construct course
     const course = {
         id: courses.length + 1,
         name: req.body.name
@@ -53,7 +63,6 @@ app.post('/api/courses', (req, res) => {
     courses.push(course)
     // send course object back to client as confirmation, plus client needs info like id etc.
     res.send(course)
-
 })
 
 // start listening on a given port, with callback function
