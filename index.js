@@ -48,10 +48,16 @@ app.get('/api/courses/:id', (req, res) => {
 
 // make post request to course
 app.post('/api/courses', (req, res) => {
+    // define course schema using Joi
+    const schema = {
+        name: Joi.string().min(3).required(),
+    }
+    // store result of Joi validation call
+    const result = Joi.validate(req.body, schema)
     // input validation
-    if (!req.body.name || req.body.name.length < 3) {
+    if (result.error) {
         // send error message
-        res.status(404).send('Name invalid')
+        res.status(404).send(result.error.details[0].message)
         return
     }
     // construct course
