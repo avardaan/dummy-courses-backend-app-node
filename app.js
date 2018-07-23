@@ -20,10 +20,12 @@ app.get('/', (req, res) => {
     res.send('Hello World!!!')
 })
 
+// GET method to obtain all courses
 app.get('/api/courses', (req, res) => {
     res.send(courses)
 })
 
+// GET particular course
 app.get('/api/courses/:id', (req, res) => {
     // wildcard variable in url is inside req.params
     /* the params object contains the value of the variable parameters
@@ -39,23 +41,17 @@ app.get('/api/courses/:id', (req, res) => {
     // array.find goes through each element and stops at that execution of the callback which
     // returns true
     const course = courses.find(element => element.id === parseInt(req.params.id))
-    if (!course) { // return 404
-        res.status(404).send('No course with given ID')
-    }
+    if (!course) return res.status(404).send('No course with given ID') // return 404
     // actual reponse
     res.send(course)  
 })
 
-// make post request to course
+// make POST request to add course
 app.post('/api/courses', (req, res) => {
     // validate function result
     const result = validateCourse(req.body)
     // input validation
-    if (result.error) {
-        // send error message
-        res.status(400).send(result.error.details[0].message)
-        return
-    }
+    if (result.error) return res.status(400).send(result.error.details[0].message)
     // construct course
     const course = {
         id: courses.length + 1,
@@ -72,22 +68,29 @@ app.put('/api/courses/:id', (req, res) => {
     // lookup course
     // if not found, return 404
     const course = courses.find(element => element.id === parseInt(req.params.id))
-    if (!course) { // return 404
-        res.status(404).send('No course with given ID')
-        return
-    }
+    if (!course) return res.status(404).send('No course with given ID')
     // validate
     // if invalid, return 400
     const result = validateCourse(req.body)
     // input validation
-    if (result.error) {
-        // send error message
-        res.status(400).send(result.error.details[0].message)
-        return
-    }
+    if (result.error) return res.status(400).send(result.error.details[0].message) // send error message
     // update course
     course.name = req.body.name
     // return the updated course
+    res.send(course)
+})
+
+// DELETE route
+app.delete('/api/courses/:id', (req, res) => {
+    // lookup course
+    // if not found, return 404
+    const course = courses.find(element => element.id === parseInt(req.params.id))
+    if (!course) return res.status(404).send('No course with given ID')
+    // find index of course object
+    const index = courses.indexOf(course)
+    // remove course at index
+    courses.splice(index, 1)
+    // return course
     res.send(course)
 })
 
