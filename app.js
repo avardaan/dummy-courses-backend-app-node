@@ -1,11 +1,16 @@
 // input validation module Joi
 const Joi = require('joi')
+// custom middleware example
+const logger = require('./logger')
 // the require express statement returns a function
 const express = require('express')
 // make an instance of the express object class
 const app = express()
 // enable json parsing
 app.use(express.json())
+// usage of custom middleware, the argument to app.use must be a function and not the result
+// of a function call
+// app.use(logger)
 
 // hardcoded courses array
 const courses = [
